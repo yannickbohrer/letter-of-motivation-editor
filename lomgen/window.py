@@ -124,7 +124,7 @@ class MainWindow(Adw.ApplicationWindow):
         no_root = Adw.StatusPage(
             icon_name="folder-open-symbolic", title="Choose your applications folder",
             description="Pick the folder that holds one folder per application, "
-                        "for example ~/GoogleDrive/Bewerbungen.")
+                        "for example ~/Applications.")
         no_root.set_child(Gtk.Button(label="Choose folder", action_name="win.choose-root",
                                      halign=Gtk.Align.CENTER, css_classes=["pill", "suggested-action"]))
         self.content_stack.add_named(no_root, "no-root")

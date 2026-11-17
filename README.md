@@ -1,7 +1,7 @@
 # Letter of Motivation
 
 Write one-page A4 application letters and export them as PDF. Each application has its own folder
-(for example `~/GoogleDrive/Bewerbungen/STARK`) with a `letter.toml` holding that letter's text.
+(for example `~/Applications/ACME`) with a `letter.toml` holding that letter's text.
 
 There are two ways to use it: a GNOME desktop app and a command-line tool. Both use the same template
 (`template/`) and the same rendering code (`lomgen/core.py`).
@@ -52,3 +52,10 @@ python3 create_letter-of-motivation.py <folder> --watch    # rebuild on save + b
 ```
 
 The first run on a folder without `letter.toml` creates one from `template/letter.toml`.
+
+## License
+
+[MIT](LICENSE) © 2026 Yannick Bohrer
+
+The bundled Roboto fonts in `template/fonts/` are licensed under the Apache License 2.0
+(see [`template/fonts/LICENSE-Roboto.txt`](template/fonts/LICENSE-Roboto.txt)).

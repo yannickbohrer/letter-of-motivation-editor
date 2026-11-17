@@ -106,7 +106,8 @@ class LetterApp(Adw.Application):
             application_name=APP_NAME, application_icon=APP_ID, version=VERSION,
             developer_name="Yannick Bohrer",
             comments="Write one-page application letters and export them as PDF.",
-            website="https://github.com/yannickbohrer/letter-of-motivation-generator")
+            website="https://github.com/yannickbohrer/letter-of-motivation-generator",
+            license_type=Gtk.License.MIT_X11)
         about.present(self._window())
 
 

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Create a letter of motivation (A4) from a per-application TOML file.
 
-Usage (from anywhere; <folder> is the application folder, e.g. ~/GoogleDrive/Bewerbungen/STARK):
-    python3 create_letter-of-motivation.py <folder>            # <folder>/letter-of-motivation_<Folder>_Bohrer-Yannick_without-signature.pdf
-    python3 create_letter-of-motivation.py <folder> --signed   # <folder>/letter-of-motivation_<Folder>_Bohrer-Yannick.pdf (with signature)
+Usage (from anywhere; <folder> is the application folder, e.g. ~/Applications/ACME):
+    python3 create_letter-of-motivation.py <folder>            # <folder>/letter-of-motivation_<Folder>_<Your-Name>_without-signature.pdf
+    python3 create_letter-of-motivation.py <folder> --signed   # <folder>/letter-of-motivation_<Folder>_<Your-Name>.pdf (with signature)
     python3 create_letter-of-motivation.py <folder> --watch    # rebuild on every save + live preview at http://127.0.0.1:8765
 
 --signed uses signature.svg (preferred) or signature.png (transparent background) from
@@ -168,7 +168,7 @@ def watch(folder: Path, port: int, signed: bool = False) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Create an A4 letter of motivation PDF.")
-    parser.add_argument("folder", help="application folder, e.g. ~/GoogleDrive/Bewerbungen/STARK")
+    parser.add_argument("folder", help="application folder, e.g. ~/Applications/ACME")
     parser.add_argument("--signed", action="store_true",
                         help="insert your signature (signature.svg or .png)")
     parser.add_argument("--watch", action="store_true", help="rebuild on save and serve a live preview")

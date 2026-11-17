@@ -1,10 +1,10 @@
 # Your own details. Shared by every letter; edit once here.
 
 # Printed under the signature line.
-name = "Yannick Bohrer"
+name = "Jane Doe"
 
-# Default place for the date line ("Munich, 17 November 2026").
-place = "Munich"
+# Default place for the date line ("City, 17 November 2026").
+place = "City"
 
 # Used in the PDF file name: letter-of-motivation_<Company>_<file_name_suffix>.pdf
-file_name_suffix = "Bohrer-Yannick"
+file_name_suffix = "Doe-Jane"
