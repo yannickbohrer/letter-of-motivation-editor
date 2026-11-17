@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Letter of Motivation
+GenericName=Application Letter Writer
+Comment=Write one-page application letters and export them as PDF
+Exec=@BINDIR@/letter-of-motivation %F
+Icon=io.github.yannickbohrer.LetterOfMotivation
+Terminal=false
+Categories=Office;WordProcessor;GTK;
+Keywords=letter;cover letter;application;motivation;bewerbung;anschreiben;pdf;
+StartupNotify=true

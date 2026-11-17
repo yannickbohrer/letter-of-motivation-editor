@@ -1,7 +1,10 @@
-# Python dependencies for create_letter-of-motivation.py
-# Setup:  python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+# Python dependencies (CLI and desktop app).
+# Setup:  python3 -m venv --system-site-packages .venv && .venv/bin/pip install -r requirements.txt
 #
-# System tool (not pip): pdftoppm from poppler-utils, used only by the --watch live preview.
+# System packages (apt, not pip):
+#   python3-gi gir1.2-gtk-4.0 gir1.2-adw-1   the desktop app (GTK4 / libadwaita via PyGObject)
+#   poppler-utils                            pdftoppm/pdfinfo: page view in the app, --watch preview
 
 weasyprint==70.0
 Jinja2==3.1.6
+tomlkit==0.15.2

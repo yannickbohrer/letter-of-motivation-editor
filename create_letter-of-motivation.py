@@ -6,13 +6,16 @@ Usage (from anywhere; <folder> is the application folder, e.g. ~/GoogleDrive/Bew
     python3 create_letter-of-motivation.py <folder> --signed   # <folder>/letter-of-motivation_<Folder>_Bohrer-Yannick.pdf (with signature)
     python3 create_letter-of-motivation.py <folder> --watch    # rebuild on every save + live preview at http://127.0.0.1:8765
 
---signed uses template/signature.svg (preferred) or template/signature.png (transparent background).
-The signature file is git-ignored, so it never ends up in the repository.
+--signed uses signature.svg (preferred) or signature.png (transparent background) from
+~/.config/letter-of-motivation-generator/, else from template/ (git-ignored there).
+Your details come from ~/.config/letter-of-motivation-generator/sender.toml, else template/sender.toml.
+The rendering code lives in lomgen/core.py and is shared with the desktop app (python3 -m lomgen).
 
 Each application folder needs a letter.toml: copy template/letter.toml there, or just run the
 script on the folder once and it copies the template for you (with the company name filled in).
 The PDF is named after the folder; set file_label in letter.toml to override it.
-Setup: python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+Setup: python3 -m venv --system-site-packages .venv && .venv/bin/pip install -r requirements.txt
+Desktop app: ./install.sh (see README.md).
 """
 
 from __future__ import annotations
@@ -30,113 +33,20 @@ if VENV_PYTHON.exists() and Path(sys.prefix).resolve() != (ROOT / ".venv").resol
     os.execv(str(VENV_PYTHON), [str(VENV_PYTHON), __file__, *sys.argv[1:]])
 
 import argparse
-import datetime as dt
-import html
 import json
-import re
 import shutil
-import subprocess
 import tempfile
 import threading
 import time
-import tomllib
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
-from jinja2 import Environment, FileSystemLoader, StrictUndefined, select_autoescape
-from markupsafe import Markup
+sys.path.insert(0, str(ROOT))
+from lomgen.core import CONFIG_DIR, LETTER_FILE, init_letter, render_pages, safe_build  # noqa: E402
 
-LETTER_FILE = "letter.toml"
-SIGNATURE_FILES = ("signature.svg", "signature.png")  # looked up in TEMPLATE_DIR, first match wins
 GREEN, YELLOW, RED, RESET = "\033[32m", "\033[33m", "\033[31m", "\033[0m"
 
 
-# ---------------------------------------------------------------- data --------
-
-def format_paragraphs(body: str) -> list[Markup]:
-    """Blank line = new paragraph, single newlines are joined. Supports *italic*; **bold** is printed plain."""
-    paragraphs = []
-    for block in re.split(r"\n\s*\n", body.strip()):
-        text = " ".join(line.strip() for line in block.splitlines() if line.strip())
-        if not text:
-            continue
-        text = html.escape(text, quote=False)
-        text = re.sub(r"\*\*(.+?)\*\*", r"\1", text)  # no bold in the body text
-        text = re.sub(r"(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)", r"<em>\1</em>", text)
-        paragraphs.append(Markup(text))
-    return paragraphs
-
-
-def load_context(folder: Path) -> dict:
-    sender = tomllib.loads((TEMPLATE_DIR / "sender.toml").read_text(encoding="utf-8"))
-    data = tomllib.loads((folder / LETTER_FILE).read_text(encoding="utf-8"))
-
-    recipient = {k: "" for k in ("company", "department", "contact", "street", "city", "country")}
-    recipient.update(data.get("recipient", {}))
-
-    letter = {"subject": "", "reference": "", "salutation": "Hiring Team", "body": "",
-              "closing": "Kind regards,", "enclosures": []}
-    letter.update(data.get("letter", {}))
-    letter["paragraphs"] = format_paragraphs(letter["body"])
-    letter["salutation"] = letter["salutation"].strip().rstrip(",")
-
-    date = (data.get("date") or "").strip()
-    if not date:
-        today = dt.date.today()
-        date = f"{today.day} {today.strftime('%B')} {today.year}"
-
-    return {
-        "sender": sender,
-        "recipient": recipient,
-        "letter": letter,
-        "date": date,
-        "place": (data.get("place") or "").strip() or sender.get("place", ""),
-        "file_label": (data.get("file_label") or "").strip(),
-    }
-
-
-def output_path(folder: Path, ctx: dict, signed: bool) -> Path:
-    label = ctx["file_label"] or folder.resolve().name
-    suffix = "" if signed else "_without-signature"
-    return folder / f"letter-of-motivation_{label}_{ctx['sender']['file_name_suffix']}{suffix}.pdf"
-
-
-def find_signature() -> str:
-    for name in SIGNATURE_FILES:
-        if (TEMPLATE_DIR / name).is_file():
-            return name
-    raise FileNotFoundError(
-        f"--signed needs a signature file: put it at {TEMPLATE_DIR / SIGNATURE_FILES[0]} "
-        f"or {TEMPLATE_DIR / SIGNATURE_FILES[1]}")
-
-
-def init_letter(folder: Path) -> Path:
-    target = folder / LETTER_FILE
-    company = folder.resolve().name
-    text = (TEMPLATE_DIR / LETTER_FILE).read_text(encoding="utf-8")
-    text = text.replace("Company Name", company)
-    target.write_text(text, encoding="utf-8")
-    return target
-
-
-# --------------------------------------------------------------- build --------
-
-def build(folder: Path, signed: bool = False) -> dict:
-    """Render the PDF. Returns a status dict (ok, pages, pdf, message)."""
-    from weasyprint import HTML  # imported lazily: slow import
-
-    ctx = load_context(folder)
-    ctx["signature"] = find_signature() if signed else None
-    env = Environment(loader=FileSystemLoader(TEMPLATE_DIR), undefined=StrictUndefined,
-                      autoescape=select_autoescape(["html", "j2"]))
-    rendered = env.get_template("letter.html.j2").render(**ctx)
-
-    document = HTML(string=rendered, base_url=str(TEMPLATE_DIR) + "/").render()
-    pdf = output_path(folder, ctx, signed)
-    document.write_pdf(pdf)
-    pages = len(document.pages)
-    return {"ok": True, "pages": pages, "pdf": str(pdf),
-            "message": "" if pages == 1 else f"Letter is {pages} pages long. It should fit on one page."}
-
+# --------------------------------------------------------------- report --------
 
 def report(status: dict) -> None:
     if not status["ok"]:
@@ -148,15 +58,6 @@ def report(status: dict) -> None:
         print(f"{GREEN}✓ [{stamp}] {rel}  (1 page){RESET}", flush=True)
     else:
         print(f"{YELLOW}⚠ [{stamp}] {rel}  ({status['message']}){RESET}", flush=True)
-
-
-def safe_build(folder: Path, signed: bool = False) -> dict:
-    try:
-        return build(folder, signed)
-    except tomllib.TOMLDecodeError as e:
-        return {"ok": False, "pages": 0, "pdf": "", "message": f"{LETTER_FILE}: {e}"}
-    except Exception as e:  # show any template/data error instead of crashing watch mode
-        return {"ok": False, "pages": 0, "pdf": "", "message": f"{type(e).__name__}: {e}"}
 
 
 # ------------------------------------------------------- watch + preview --------
@@ -200,13 +101,8 @@ poll();
 
 
 def render_preview(status: dict, preview_dir: Path, version: int) -> None:
-    images = []
-    if status["ok"] and shutil.which("pdftoppm"):
-        for old in preview_dir.glob("page-*.png"):
-            old.unlink()
-        subprocess.run(["pdftoppm", "-png", "-r", "160", status["pdf"], str(preview_dir / "page")],
-                       check=False)
-        images = sorted(p.name for p in preview_dir.glob("page-*.png"))
+    images = [p.name for p in render_pages(status["pdf"], preview_dir)] if status["ok"] else []
+    status = {k: v for k, v in status.items() if k != "layout"}
     payload = {**status, "version": version, "images": images, "time": time.strftime("%H:%M:%S")}
     (preview_dir / "status.json").write_text(json.dumps(payload), encoding="utf-8")
 
@@ -237,7 +133,8 @@ def serve(preview_dir: Path, port: int) -> int:
 
 
 def watched_files(folder: Path) -> list[Path]:
-    return [folder / LETTER_FILE, *(p for p in TEMPLATE_DIR.rglob("*") if p.is_file())]
+    files = [folder / LETTER_FILE, *(p for p in TEMPLATE_DIR.rglob("*") if p.is_file())]
+    return files + [p for p in CONFIG_DIR.glob("*") if p.is_file()] if CONFIG_DIR.is_dir() else files
 
 
 def snapshot(files: list[Path]) -> dict:
@@ -273,7 +170,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Create an A4 letter of motivation PDF.")
     parser.add_argument("folder", help="application folder, e.g. ~/GoogleDrive/Bewerbungen/STARK")
     parser.add_argument("--signed", action="store_true",
-                        help="insert the signature from template/signature.svg or .png")
+                        help="insert your signature (signature.svg or .png)")
     parser.add_argument("--watch", action="store_true", help="rebuild on save and serve a live preview")
     parser.add_argument("--port", type=int, default=8765, help="preview port for --watch (default 8765)")
     args = parser.parse_args()

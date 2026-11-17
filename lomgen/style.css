@@ -1,0 +1,39 @@
+/* Letter of Motivation: the app frame is plain Adwaita; only the page area has its own look. */
+
+/* The desk the page lies on. */
+.desk {
+  background-color: #D9DDE1;
+}
+.desk .page-bar {
+  border-top: 1px solid alpha(black, 0.08);
+}
+.page-caption {
+  font-feature-settings: "tnum";
+}
+
+/* Body editor: the letter's own font and size, so what you type looks like the print. */
+.body-frame {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 0 0 1px var(--border-color, alpha(black, 0.15));
+  background-color: var(--card-bg-color, white);
+}
+.body-frame > textview,
+.body-frame > textview > text {
+  background-color: transparent;
+  border-radius: 12px;
+}
+textview.letter-body {
+  font-family: "Roboto", sans-serif;
+  font-size: 11pt;
+  line-height: 1.5;
+  min-height: 220px;
+}
+
+/* libadwaita's dark state, set on the window by the app (follows the system style). */
+.dark-style .desk {
+  background-color: #26282C;
+}
+.dark-style .desk .page-bar {
+  border-top-color: alpha(white, 0.08);
+}
