@@ -1,0 +1,46 @@
+# Letter of motivation: content for ONE application.
+#
+# New application:
+#   1. Copy this file into the application folder, e.g.
+#        cp ~/Code/letter-of-motivation-generator/template/letter.toml ~/GoogleDrive/Bewerbungen/<Company>/
+#   2. Replace the placeholders below.
+#   3. Build (add --watch for a live preview that updates on every save):
+#        python3 ~/Code/letter-of-motivation-generator/create_letter-of-motivation.py ~/GoogleDrive/Bewerbungen/<Company>
+#
+# Optional fields can be left as "" (they are then hidden).
+
+# Leave empty for today's date. Otherwise e.g. "17 November 2026".
+date  = ""
+# Leave empty to use the place from template/sender.toml (Munich).
+place = ""
+# Optional: name used in the PDF file name. Empty = the application folder's name.
+file_label = ""
+
+[recipient]
+company    = "Company Name"
+department = ""                 # optional, e.g. "Human Resources"
+contact    = ""                 # optional, e.g. "Ms Jane Doe"
+street     = "Street 1"
+city       = "12345 City"
+country    = ""                 # optional, e.g. "Germany"
+
+[letter]
+subject    = "Application for Position Title"
+reference  = ""                 # optional, e.g. "12345" -> "(Ref. 12345)"
+
+# Everything after "Dear". The comma is added automatically.
+salutation = "Company Name Team"
+
+# Blank line = new paragraph. *italic* is supported (no bold in the body).
+body = """
+First paragraph.
+
+Second paragraph.
+
+Third paragraph.
+"""
+
+closing    = "Kind regards,"
+
+# Shown in the footer. Set to [] to hide the line.
+enclosures = ["Curriculum Vitae", "Transcript of Records"]

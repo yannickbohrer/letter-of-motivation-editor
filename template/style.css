@@ -1,0 +1,102 @@
+/* Letter of motivation: A4, black only, margins aligned with the CV. */
+
+@font-face { font-family: "Roboto"; font-weight: 400; font-style: normal; src: url("fonts/Roboto-Regular.ttf"); }
+@font-face { font-family: "Roboto"; font-weight: 400; font-style: italic; src: url("fonts/Roboto-Italic.ttf"); }
+@font-face { font-family: "Roboto"; font-weight: 700; font-style: normal; src: url("fonts/Roboto-Bold.ttf"); }
+
+/* Same side margins as the CV (20 mm). */
+@page {
+  size: A4;
+  margin: 28mm 20mm 20mm 20mm;
+}
+@page :first {
+  @bottom-right {
+    content: element(enclosures);
+    width: 100%;
+    vertical-align: middle;
+  }
+}
+
+:root {
+  --ink: #000;
+  --muted: #777;         /* the CV's gray label colour */
+  --text-size: 11pt;
+  --line: 1.45;
+}
+
+html { color: var(--ink); }
+
+body {
+  margin: 0;
+  font-family: "Roboto", sans-serif;
+  font-size: var(--text-size);
+  line-height: var(--line);
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  text-align: left;
+  hyphens: manual;
+}
+
+p { margin: 0; }
+
+/* ---------- Recipient, then date (right-aligned) ---------- */
+
+.address { line-height: 1.35; }
+
+/* ---------- Body ---------- */
+
+.date {
+  margin-top: 18mm;
+  text-align: right;
+}
+
+.subject {
+  margin-top: 14mm;
+  font-weight: 700;
+}
+
+.salutation {
+  margin-top: 8mm;
+}
+
+.body { margin-top: calc(var(--line) * 1em); }
+.body p + p { margin-top: calc(var(--line) * 1em); }
+
+.sign-off {
+  margin-top: calc(var(--line) * 1em);
+  break-inside: avoid;
+}
+
+.signature-space {
+  height: 28mm;
+  position: relative;
+}
+
+/* Signature image (--signed): sits on the line, overlapping it slightly like ink would. */
+.signature {
+  position: absolute;
+  left: 4mm;
+  bottom: -1mm;
+  width: 56mm;
+  height: 25mm;
+  transform: rotate(7deg);      /* tilt clockwise so the stroke runs flatter along the line */
+  transform-origin: left bottom;
+  object-fit: contain;          /* keeps proportions, any SVG/PNG size */
+  object-position: left bottom;
+}
+
+.signature-line {
+  width: 65mm;
+  border-top: 0.5pt solid var(--ink);
+}
+
+.signature-name {
+  margin-top: 1.5mm;
+}
+
+/* Enclosures: moved into the page footer, right-aligned. */
+.enclosures {
+  position: running(enclosures);
+  font-size: 9pt;
+  text-align: right;
+  color: var(--muted);
+}

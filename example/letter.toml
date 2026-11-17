@@ -1,0 +1,32 @@
+# Dummy letter that uses every field of the template. For reference only.
+
+date  = ""
+place = ""
+file_label = "Example-Company"
+
+[recipient]
+company    = "Example Company GmbH"
+department = "Talent Acquisition"
+contact    = "Ms Jane Doe"
+street     = "Musterstraße 42"
+city       = "80331 Munich"
+country    = "Germany"
+
+[letter]
+subject    = "Application for Software Engineer (Working Student)"
+reference  = "SE-2026-117"
+
+salutation = "Ms Doe"
+
+body = """
+This is neutral dummy text. It has no connection to any earlier letter and only shows how a full letter of motivation sits on the page. The opening paragraph would name the position and give a short, specific reason for applying to this company in particular.
+
+The second paragraph would describe the most relevant experience. In the real letter, this is where two or three concrete examples go, each linked to a requirement from the job posting. Dummy sentences fill the space here so that line length, paragraph spacing and the overall balance of the page can be judged.
+
+The third paragraph would cover working style and motivation. It might explain how the applicant approaches problems, works with others, and what they want to learn in the role. Again, this is only placeholder text of realistic length.
+
+The final paragraph would state availability, thank the reader for their time, and express interest in a conversation.
+"""
+
+closing    = "Kind regards,"
+enclosures = ["Curriculum Vitae", "Transcript of Records", "Reference Letters"]

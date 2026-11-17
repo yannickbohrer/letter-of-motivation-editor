@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Letter of Motivation – {{ sender.name }} – {{ recipient.company }}</title>
+  <meta name="author" content="{{ sender.name }}">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <main>
+    <!-- Recipient -->
+    <section class="recipient">
+      <div class="address">
+        <div>{{ recipient.company }}</div>
+        {% if recipient.department %}<div>{{ recipient.department }}</div>{% endif %}
+        {% if recipient.contact %}<div>{{ recipient.contact }}</div>{% endif %}
+        <div>{{ recipient.street }}</div>
+        <div>{{ recipient.city }}</div>
+        {% if recipient.country %}<div>{{ recipient.country }}</div>{% endif %}
+      </div>
+    </section>
+
+    <!-- Place and date, right-aligned -->
+    <p class="date">{{ place }}, {{ date }}</p>
+
+    <p class="subject">{{ letter.subject }}{% if letter.reference %} (Ref. {{ letter.reference }}){% endif %}</p>
+
+    <p class="salutation">Dear {{ letter.salutation }},</p>
+
+    <div class="body">
+      {% for paragraph in letter.paragraphs %}<p>{{ paragraph }}</p>
+      {% endfor %}
+    </div>
+
+    <div class="sign-off">
+      <p class="closing">{{ letter.closing }}</p>
+      <div class="signature-space">
+        {% if signature %}<img class="signature" src="{{ signature }}" alt="Signature">{% endif %}
+      </div>
+      <div class="signature-line"></div>
+      <p class="signature-name">{{ sender.name }}</p>
+    </div>
+
+    {% if letter.enclosures %}
+    <p class="enclosures">Enclosures: {{ letter.enclosures | join(", ") }}</p>
+    {% endif %}
+  </main>
+
+</body>
+</html>
