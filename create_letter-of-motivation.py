@@ -7,8 +7,8 @@ Usage (from anywhere; <folder> is the application folder, e.g. ~/Applications/AC
     python3 create_letter-of-motivation.py <folder> --watch    # rebuild on every save + live preview at http://127.0.0.1:8765
 
 --signed uses signature.svg (preferred) or signature.png (transparent background) from
-~/.config/letter-of-motivation-generator/, else from template/ (git-ignored there).
-Your details come from ~/.config/letter-of-motivation-generator/sender.toml, else template/sender.toml.
+~/.config/letter-of-motivation-editor/, else from template/ (git-ignored there).
+Your details come from ~/.config/letter-of-motivation-editor/sender.toml, else template/sender.toml.
 The rendering code lives in lomgen/core.py and is shared with the desktop app (python3 -m lomgen).
 
 Each application folder needs a letter.toml: copy template/letter.toml there, or just run the

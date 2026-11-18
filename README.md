@@ -20,8 +20,8 @@ flowchart LR
 **1. Get the code**
 
 ```sh
-git clone https://github.com/yannickbohrer/letter-of-motivation-generator.git
-cd letter-of-motivation-generator
+git clone https://github.com/yannickbohrer/letter-of-motivation-editor.git
+cd letter-of-motivation-editor
 ```
 
 **2. Install**
@@ -46,17 +46,17 @@ On first start, pick the folder that holds your applications, then set your name
 | Uninstall      | `./uninstall.sh`                |
 
 `./uninstall.sh` removes the app, its launcher and menu entry. Your letters and your settings in
-`~/.config/letter-of-motivation-generator/` stay.
+`~/.config/letter-of-motivation-editor/` stay.
 
 <details>
 <summary>Where the installer puts things</summary>
 
 | What                    | Where                                                   |
 | ----------------------- | ------------------------------------------------------- |
-| App and its Python env  | `~/.local/share/letter-of-motivation-generator/`        |
+| App and its Python env  | `~/.local/share/letter-of-motivation-editor/`           |
 | Launcher                | `~/.local/bin/letter-of-motivation`                     |
 | Menu entry and icon     | `~/.local/share/applications/`, `~/.local/share/icons/` |
-| Your details, signature | `~/.config/letter-of-motivation-generator/`             |
+| Your details, signature | `~/.config/letter-of-motivation-editor/`                |
 
 </details>
 
@@ -73,7 +73,7 @@ On first start, pick the folder that holds your applications, then set your name
 ### Your details
 
 Your name, default place, file-name suffix and signature are set under Preferences. They are stored
-in `~/.config/letter-of-motivation-generator/` (`sender.toml`, `signature.svg` or `.png`), and the CLI
+in `~/.config/letter-of-motivation-editor/` (`sender.toml`, `signature.svg` or `.png`), and the CLI
 uses them too. If that folder doesn't exist, both fall back to `template/`.
 
 ## Command line

@@ -19,7 +19,7 @@ from markupsafe import Markup
 
 ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE_DIR = ROOT / "template"
-CONFIG_DIR = Path(os.environ.get("XDG_CONFIG_HOME") or Path.home() / ".config") / "letter-of-motivation-generator"
+CONFIG_DIR = Path(os.environ.get("XDG_CONFIG_HOME") or Path.home() / ".config") / "letter-of-motivation-editor"
 
 LETTER_FILE = "letter.toml"
 SENDER_FILE = "sender.toml"
@@ -32,7 +32,7 @@ BLOCKS = ("recipient", "date", "subject", "salutation", "body", "sign-off", "enc
 # ---------------------------------------------------------------- paths --------
 
 def sender_path() -> Path:
-    """Your details: ~/.config/letter-of-motivation-generator/sender.toml, else template/sender.toml."""
+    """Your details: ~/.config/letter-of-motivation-editor/sender.toml, else template/sender.toml."""
     user = CONFIG_DIR / SENDER_FILE
     return user if user.is_file() else TEMPLATE_DIR / SENDER_FILE
 

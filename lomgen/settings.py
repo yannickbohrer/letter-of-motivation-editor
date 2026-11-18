@@ -1,4 +1,4 @@
-"""App settings in ~/.config/letter-of-motivation-generator/settings.toml."""
+"""App settings in ~/.config/letter-of-motivation-editor/settings.toml."""
 
 from __future__ import annotations
 

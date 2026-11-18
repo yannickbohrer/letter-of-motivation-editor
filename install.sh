@@ -2,17 +2,25 @@
 # Install (or update) the Letter of Motivation desktop app for the current user. No sudo needed.
 #
 #   ./install.sh      run again after `git pull` to update
-#   ./uninstall.sh    removes the app, keeps your settings in ~/.config/letter-of-motivation-generator
+#   ./uninstall.sh    removes the app, keeps your settings in ~/.config/letter-of-motivation-editor
 set -euo pipefail
 
 APP_ID="io.github.yannickbohrer.LetterOfMotivation"
 SRC="$(cd "$(dirname "$0")" && pwd)"
 DATA="${XDG_DATA_HOME:-$HOME/.local/share}"
-DEST="$DATA/letter-of-motivation-generator"
+DEST="$DATA/letter-of-motivation-editor"
 BINDIR="$HOME/.local/bin"
-CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/letter-of-motivation-generator"
+CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/letter-of-motivation-editor"
 
 say() { printf '\033[1m%s\033[0m\n' "$*"; }
+
+# ---- migrate from the old project name (letter-of-motivation-generator)
+OLD_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/letter-of-motivation-generator"
+if [ -d "$OLD_CONFIG" ] && [ ! -e "$CONFIG" ]; then
+  say "Moving settings to $CONFIG"
+  mv "$OLD_CONFIG" "$CONFIG"
+fi
+rm -rf "$DATA/letter-of-motivation-generator"
 
 # ---- system packages (apt) the app needs
 missing=()
