@@ -38,16 +38,19 @@ body {
 
 p { margin: 0; }
 
-/* ---------- Recipient, then date (right-aligned) ---------- */
+/* ---------- Recipient, with place and date top right ---------- */
+
+.recipient { display: flow-root; }   /* contain the floated date */
 
 .address { line-height: 1.35; }
 
-/* ---------- Body ---------- */
-
 .date {
-  margin-top: 18mm;
-  text-align: right;
+  float: right;
+  margin-left: 8mm;
+  line-height: 1.35;                 /* match .address so it shares the company line's baseline */
 }
+
+/* ---------- Body ---------- */
 
 .subject {
   margin-top: 14mm;

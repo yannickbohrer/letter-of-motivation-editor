@@ -11,6 +11,8 @@
   <main>
     <!-- Recipient -->
     <section class="recipient">
+      <!-- Place and date, top right on the company-name line -->
+      <p class="date">{{ place }}, {{ date }}</p>
       <div class="address">
         <div>{{ recipient.company }}</div>
         {% if recipient.department %}<div>{{ recipient.department }}</div>{% endif %}
@@ -20,9 +22,6 @@
         {% if recipient.country %}<div>{{ recipient.country }}</div>{% endif %}
       </div>
     </section>
-
-    <!-- Place and date, right-aligned -->
-    <p class="date">{{ place }}, {{ date }}</p>
 
     <p class="subject">{{ letter.subject }}{% if letter.reference %} (Ref. {{ letter.reference }}){% endif %}</p>
 
