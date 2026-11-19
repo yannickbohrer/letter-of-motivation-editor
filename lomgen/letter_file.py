@@ -7,6 +7,8 @@ from pathlib import Path
 import tomlkit
 from tomlkit.items import Table
 
+from .core import DEFAULT_FONT_SIZE
+
 # The fields the editor shows, as (table or None for top level, key).
 FIELDS = (
     ("recipient", "company"), ("recipient", "department"), ("recipient", "contact"),
@@ -14,7 +16,7 @@ FIELDS = (
     (None, "place"), (None, "date"),
     ("letter", "subject"), ("letter", "reference"), ("letter", "salutation"),
     ("letter", "body"), ("letter", "closing"), ("letter", "enclosures"),
-    (None, "file_label"),
+    (None, "file_label"), (None, "font_size"),
 )
 
 
@@ -74,8 +76,13 @@ def read_letter(folder: Path) -> tuple[TomlFile, dict]:
     f = TomlFile(folder / "letter.toml")
     values = {}
     for table, key in FIELDS:
-        default = [] if key == "enclosures" else ""
+        default = {"enclosures": [], "font_size": DEFAULT_FONT_SIZE}.get(key, "")
         value = f.get(table, key, default)
+        if key == "font_size":
+            try:
+                value = float(value or DEFAULT_FONT_SIZE)
+            except (TypeError, ValueError):
+                value = float(DEFAULT_FONT_SIZE)
         if key == "body":
             value = value.strip("\n")
         values[f"{table}.{key}" if table else key] = value
@@ -93,5 +100,9 @@ def write_letter(f: TomlFile, values: dict) -> bool:
             if current.strip("\n") == value.strip("\n"):
                 continue
             value = value.strip("\n")
+        if key == "font_size":
+            if f.get(table, key, None) is None and value == DEFAULT_FONT_SIZE:
+                continue          # don't add the default to letters that never set it
+            value = int(value) if float(value).is_integer() else float(value)
         f.set(table, key, value)
     return f.save()

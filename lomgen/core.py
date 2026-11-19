@@ -26,6 +26,10 @@ SENDER_FILE = "sender.toml"
 SIGNATURE_FILES = ("signature.svg", "signature.png")  # first match wins, CONFIG_DIR before TEMPLATE_DIR
 
 # Blocks of letter.html.j2 (by CSS class) that the app can point at.
+# Letter text size in pt (letter.toml: font_size). The editor offers FONT_SIZE_RANGE.
+DEFAULT_FONT_SIZE = 11
+FONT_SIZE_RANGE = (9, 13)
+
 BLOCKS = ("recipient", "date", "subject", "salutation", "body", "sign-off", "enclosures")
 
 
@@ -87,8 +91,16 @@ def load_context(folder: Path) -> dict:
     letter["paragraphs"] = format_paragraphs(letter["body"])
     letter["salutation"] = letter["salutation"].strip().rstrip(",")
 
+    try:
+        font_size = float(data.get("font_size") or DEFAULT_FONT_SIZE)
+    except (TypeError, ValueError):
+        raise ValueError(f"{LETTER_FILE}: font_size must be a number, e.g. 11 or 10.5") from None
+    low, high = FONT_SIZE_RANGE
+    font_size = min(max(font_size, low), high)
+
     return {
         "sender": sender,
+        "font_size": f"{font_size:g}",
         "recipient": recipient,
         "letter": letter,
         "date": (data.get("date") or "").strip() or today(),
@@ -124,7 +136,7 @@ def _walk(box):
         yield from _walk(child)
 
 
-def layout_info(document) -> dict:
+def layout_info(document, font_size: float = DEFAULT_FONT_SIZE) -> dict:
     """Where things landed, in CSS px (96 per inch), for the app's page-fill gauge and block outlines.
 
     fill: how far down the content area the letter reaches; 1.0 = exactly one full page, >1 = overflow.
@@ -134,7 +146,7 @@ def layout_info(document) -> dict:
     blocks: dict[str, list[tuple]] = {}
     first = document.pages[0]._page_box
     content_y, content_h = first.content_box_y(), first.height
-    line_h = 11 * 96 / 72 * 1.45
+    line_h = font_size * 96 / 72 * 1.45
 
     for index, page in enumerate(document.pages):
         for box in _walk(page._page_box):
@@ -185,7 +197,7 @@ def build(folder: Path, signed: bool = False, pdf_path: Path | None = None) -> d
     pdf = pdf_path or output_path(folder, ctx, signed)
     document.write_pdf(pdf)
     pages = len(document.pages)
-    return {"ok": True, "pages": pages, "pdf": str(pdf), "layout": layout_info(document),
+    return {"ok": True, "pages": pages, "pdf": str(pdf), "layout": layout_info(document, float(ctx["font_size"])),
             "message": "" if pages == 1 else f"Letter is {pages} pages long. It should fit on one page."}
 
 

@@ -6,7 +6,7 @@ import gi
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
-from gi.repository import Adw, GObject, Gtk  # noqa: E402
+from gi.repository import Adw, Gdk, GObject, Gtk  # noqa: E402
 
 from . import core  # noqa: E402
 
@@ -86,6 +86,22 @@ class Editor(Gtk.ScrolledWindow):
         self._add_entry(sign_off, "letter.enclosures", enclosures, "enclosures")
         box.append(sign_off)
 
+        layout = Adw.PreferencesGroup(title="Layout")
+        low, high = core.FONT_SIZE_RANGE
+        self.font_size = Adw.SpinRow(
+            title="Font size", subtitle="Points. Smaller fits more on the page.", digits=1,
+            adjustment=Gtk.Adjustment(lower=low, upper=high, step_increment=0.5, page_increment=1,
+                                      value=core.DEFAULT_FONT_SIZE))
+        self.font_size.connect("notify::value", self._on_font_size)
+        self._watch_focus(self.font_size, "body")
+        layout.add(self.font_size)
+        box.append(layout)
+        # Keeps the body editor's text at the letter's size.
+        self._body_css = Gtk.CssProvider()
+        Gtk.StyleContext.add_provider_for_display(Gdk.Display.get_default(), self._body_css,
+                                                  Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION + 1)
+        self._apply_body_size()
+
         file_group = Adw.PreferencesGroup(title="File name")
         self._add_entry(file_group, "file_label", Adw.EntryRow(title="Name in the PDF file name"), None)
         self.file_name = Gtk.Label(xalign=0, wrap=True, selectable=True, margin_top=8,
@@ -127,6 +143,9 @@ class Editor(Gtk.ScrolledWindow):
             buffer = self.body.get_buffer()
             if buffer.get_text(buffer.get_start_iter(), buffer.get_end_iter(), False) != body:
                 buffer.set_text(body)
+            size = values.get("font_size", core.DEFAULT_FONT_SIZE)
+            if self.font_size.get_value() != size:
+                self.font_size.set_value(size)
         finally:
             self._loading = False
         self._update_hints()
@@ -141,7 +160,15 @@ class Editor(Gtk.ScrolledWindow):
                 out[name] = text
         buffer = self.body.get_buffer()
         out["letter.body"] = buffer.get_text(buffer.get_start_iter(), buffer.get_end_iter(), False)
+        out["font_size"] = round(self.font_size.get_value() * 2) / 2
         return out
+
+    def _on_font_size(self, *_):
+        self._apply_body_size()
+        self._on_changed()
+
+    def _apply_body_size(self):
+        self._body_css.load_from_string(f"textview.letter-body {{ font-size: {self.font_size.get_value():g}pt; }}")
 
     def _on_changed(self, *_):
         self._update_hints()
