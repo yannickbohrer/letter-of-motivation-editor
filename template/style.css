@@ -44,6 +44,8 @@ p { margin: 0; }
 
 .address { line-height: 1.35; }
 
+.company { font-weight: 700; }
+
 .date {
   float: right;
   margin-left: 8mm;

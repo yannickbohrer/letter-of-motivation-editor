@@ -15,7 +15,7 @@
       <!-- Place and date, top right on the company-name line -->
       <p class="date">{{ place }}, {{ date }}</p>
       <div class="address">
-        <div>{{ recipient.company }}</div>
+        <div class="company">{{ recipient.company }}</div>
         {% if recipient.department %}<div>{{ recipient.department }}</div>{% endif %}
         {% if recipient.contact %}<div>{{ recipient.contact }}</div>{% endif %}
         <div>{{ recipient.street }}</div>
